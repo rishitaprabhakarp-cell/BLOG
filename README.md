@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Research & Engineering Blog
 
-## Getting Started
+Stripe.dev–inspired personal blog backed by **Supabase**. No mock content — all posts, notes, and projects come from your database.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 · TypeScript · Tailwind CSS v4
+- Supabase (Postgres + RLS)
+- react-markdown · Fuse.js command palette
+
+## Setup
+
+### 1. Install
+
+```bash
+cd portfolio
+npm install
+```
+
+### 2. Environment
+
+`.env.local` is already configured with your Supabase project. Set production URL when deploying:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+```
+
+### 3. Create database tables
+
+Open **Supabase Dashboard → SQL Editor** and run:
+
+`supabase/migrations/001_blog_schema.sql`
+
+This creates `posts`, `notes`, `projects`, and `reading_list` with public read RLS policies.
+
+### 4. Add content
+
+Insert rows via Supabase Table Editor or SQL. Example post:
+
+```sql
+insert into posts (slug, title, description, body, published, featured, tags, category)
+values (
+  'my-first-post',
+  'My First Post',
+  'A short summary for cards and SEO.',
+  '## Hello\n\nYour markdown body here.',
+  true,
+  true,
+  array['engineering'],
+  'engineering'
+);
+```
+
+### 5. Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3001](http://localhost:3001)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Design
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Terminal-inspired UI matching stripe.dev patterns:
 
-## Learn More
+- Bracket navigation `[B] BLOG`, `[C] CONSOLE`
+- Grid background with `/ SECTION` labels
+- Lime hover rows on blog index
+- Terminal-frame featured cards
+- Metadata sidebar on articles
+- Stats ticker footer
 
-To learn more about Next.js, take a look at the following resources:
+## Routes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Path | Description |
+|------|-------------|
+| `/` | Home hub |
+| `/blog` | Post index (stripe.dev list style) |
+| `/blog/[slug]` | Article with `/ METADATA` sidebar |
+| `/notes` | Research notes |
+| `/projects` | Project writeups |
+| `/about` | Portfolio / contact |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy (Vercel)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push to GitHub
+2. Import repo, set root to `portfolio`
+3. Add env vars (`NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_SITE_URL`)
+4. Deploy

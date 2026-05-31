@@ -1,26 +1,368 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050a14;
+  --foreground: #e8edf5;
+  --muted: #8b9cb3;
+  --muted-2: #5c6d82;
+  --card: rgba(255, 255, 255, 0.02);
+  --card-hover: rgba(255, 255, 255, 0.04);
+  --border: rgba(94, 234, 212, 0.12);
+  --border-strong: rgba(94, 234, 212, 0.22);
+  --accent: #5eead4;
+  --accent-2: #2dd4bf;
+  --accent-fg: #5eead4;
+  --accent-soft: rgba(94, 234, 212, 0.08);
+  --highlight: #b3ff66;
+  --highlight-fg: #0a0f0a;
+  --orange: #e8a849;
+  --terminal-bg: #070d18;
+  --nav-bg: rgba(5, 10, 20, 0.92);
+  --nav-fg: #5eead4;
+  --nav-fg-muted: rgba(94, 234, 212, 0.55);
+  --nav-bracket: rgba(94, 234, 212, 0.45);
+  --nav-key: #5eead4;
+  --nav-active-border: rgba(94, 234, 212, 0.45);
+  --nav-active-dimmed-bg: rgba(94, 234, 212, 0.1);
+  --nav-active-dimmed-border: rgba(94, 234, 212, 0.28);
+  --grid-line: rgba(94, 234, 212, 0.06);
+  --grid-plus: rgba(94, 234, 212, 0.18);
+  --selection-bg: rgba(179, 255, 102, 0.25);
+  --selection-fg: #ffffff;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --background: #f4f7fb;
+  --foreground: #0a0f14;
+  --muted: #4a5568;
+  --muted-2: #718096;
+  --card: rgba(0, 0, 0, 0.02);
+  --card-hover: rgba(0, 0, 0, 0.04);
+  --border: rgba(0, 80, 70, 0.12);
+  --border-strong: rgba(0, 80, 70, 0.22);
+  --accent: #0d9488;
+  --accent-2: #0f766e;
+  --accent-fg: #0d9488;
+  --accent-soft: rgba(13, 148, 136, 0.08);
+  --highlight: #84cc16;
+  --highlight-fg: #0a0f0a;
+  --orange: #c27803;
+  --terminal-bg: #ffffff;
+  --nav-bg: rgba(244, 247, 251, 0.92);
+  --nav-fg: #0d9488;
+  --nav-fg-muted: rgba(13, 148, 136, 0.6);
+  --nav-bracket: rgba(13, 148, 136, 0.45);
+  --nav-key: #0d9488;
+  --nav-active-border: rgba(13, 148, 136, 0.35);
+  --nav-active-dimmed-bg: rgba(13, 148, 136, 0.1);
+  --nav-active-dimmed-border: rgba(13, 148, 136, 0.28);
+  --grid-line: rgba(0, 80, 70, 0.08);
+  --grid-plus: rgba(0, 80, 70, 0.2);
+  --selection-bg: rgba(132, 204, 22, 0.25);
+  --selection-fg: #0a0f14;
+  color-scheme: light;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-highlight: var(--highlight);
+  --color-highlight-fg: var(--highlight-fg);
+  --color-orange: var(--orange);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-geist-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-fg);
+}
+
+.stripe-grid {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.stripe-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--grid-plus) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.35;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.prose-blog {
+  color: var(--foreground);
+  line-height: 1.75;
+}
+
+.prose-blog h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.prose-blog h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.prose-blog p {
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+.prose-blog a {
+  color: var(--accent-fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-blog ul,
+.prose-blog ol {
+  margin: 1rem 0 1rem 1.25rem;
+  color: var(--muted);
+}
+
+.prose-blog li {
+  margin-bottom: 0.35rem;
+}
+
+.prose-blog code {
+  border-radius: 0.25rem;
+  background: var(--accent-soft);
+  padding: 0.1rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--accent-fg);
+}
+
+.prose-blog pre {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  background: var(--terminal-bg);
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.prose-blog pre code {
+  background: transparent;
+  padding: 0;
+  color: var(--foreground);
+}
+
+.prose-blog blockquote {
+  margin: 1.5rem 0;
+  border-left: 2px solid var(--accent);
+  padding-left: 1rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.prose-blog table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.prose-blog th,
+.prose-blog td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.prose-blog th {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-2);
+}
+
+.empty-state {
+  border: 1px dashed var(--border-strong);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--muted-2);
+}
+
+/*
+ * Console hover — full fill for links/buttons (matches [C] CONSOLE button).
+ * Use .console-border-hover or .console-card for outline-only highlight.
+ */
+.console-hover {
+  cursor: default;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease;
+}
+
+.console-border-hover {
+  transition: border-color 180ms ease;
+}
+
+/* Card blocks — border highlight only; background & text stay as-is */
+.console-card {
+  cursor: default;
+  background-color: var(--card);
+  transition: border-color 180ms ease;
+}
+
+a.console-hover,
+button.console-hover,
+[role="button"].console-hover {
+  cursor: pointer;
+}
+
+:where(
+  a[href],
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"],
+  label[for],
+  summary
+):not(.no-console-hover) {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    opacity 180ms ease;
+}
+
+/* Primary nav — active tab dims when another tab is hovered */
+.nav-primary:has(.nav-tab:hover) .nav-tab-active:not(:hover) {
+  background-color: var(--nav-active-dimmed-bg);
+  border-color: var(--nav-active-dimmed-border);
+  color: var(--nav-fg-muted);
+}
+
+.nav-primary:has(.nav-tab:hover) .nav-tab-active:not(:hover) .nav-key,
+.nav-primary:has(.nav-tab:hover) .nav-tab-active:not(:hover) .nav-bracket {
+  color: var(--nav-key);
+}
+
+@media (hover: hover) {
+  .nav-tab:hover {
+    border-color: var(--highlight) !important;
+    background-color: var(--highlight) !important;
+    color: var(--highlight-fg) !important;
+  }
+
+  .nav-tab:hover .nav-key {
+    color: var(--highlight-fg) !important;
+  }
+
+  .nav-tab:hover .nav-bracket {
+    color: color-mix(in srgb, var(--highlight-fg) 55%, transparent) !important;
+  }
+}
+
+@media (hover: hover) {
+  /* Cards & tags — green border outline only */
+  .console-card:hover,
+  .console-border-hover:hover {
+    border-color: var(--highlight) !important;
+  }
+
+  /* Links & pills — full console fill */
+  .console-hover:hover {
+    background-color: var(--highlight) !important;
+    color: var(--highlight-fg) !important;
+    border-color: var(--highlight) !important;
+  }
+
+  .console-hover:hover svg {
+    color: var(--highlight-fg) !important;
+  }
+
+  :where(
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]),
+    [role="option"],
+    summary
+  ):not(.no-console-hover):hover {
+    background-color: var(--highlight) !important;
+    color: var(--highlight-fg) !important;
+    border-color: var(--highlight) !important;
+  }
+
+  :where(
+    button:not(:disabled),
+    [role="button"],
+    [role="option"]
+  ):not(.no-console-hover):hover svg {
+    color: var(--highlight-fg) !important;
+  }
+
+  .prose-blog a:hover {
+    background-color: transparent !important;
+    color: var(--accent-fg) !important;
+    border-color: transparent !important;
+  }
+
+  .console-btn:hover {
+    opacity: 0.88;
+  }
+}
+
+.console-border-hover:focus,
+.console-border-hover:focus-visible {
+  border-color: var(--highlight) !important;
+  outline: none;
+}
+
+.matrix-text .matrix-char {
+  font-family: var(--font-mono);
+  will-change: contents, color, text-shadow;
+}
+
+.matrix-char-settled {
+  color: var(--orange);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
