@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import CommandPalette, { type CommandItem } from "@/components/blog/CommandPalette";
 import ThemeToggle from "@/components/ThemeToggle";
+import GridSoundToggle from "@/components/stripe/GridSoundToggle";
 import { cn } from "@/lib/utils";
 import { fadeIn } from "@/lib/motion";
 
@@ -61,6 +62,7 @@ export default function Navbar({ commandItems }: NavbarProps) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <GridSoundToggle />
           <CommandPalette items={commandItems} variant="console" />
           <ThemeToggle />
         </div>

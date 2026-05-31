@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StripeNavbar from "@/components/stripe/Navbar";
 import GridShell from "@/components/stripe/GridShell";
+import { GridSoundsProvider } from "@/components/stripe/GridSoundsProvider";
 import PageTransition from "@/components/motion/PageTransition";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ThemeScript from "@/components/ThemeScript";
@@ -103,12 +104,14 @@ export default async function RootLayout({
       <body id="top" className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
           <ToastProvider>
-            <GridShell className="flex min-h-full flex-col">
-              <StripeNavbar commandItems={commandItems} />
-              <PageTransition>
-                <div className="flex flex-1 flex-col">{children}</div>
-              </PageTransition>
-            </GridShell>
+            <GridSoundsProvider>
+              <GridShell className="flex min-h-full flex-col">
+                <StripeNavbar commandItems={commandItems} />
+                <PageTransition>
+                  <div className="flex flex-1 flex-col">{children}</div>
+                </PageTransition>
+              </GridShell>
+            </GridSoundsProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>
