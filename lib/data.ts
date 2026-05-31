@@ -1,6 +1,8 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import readingTime from "reading-time";
+import { projects as localProjects } from "@/content/projects";
 import type { Note, Post, PostCategory, Project, ReadingItem } from "@/lib/database.types";
+import { slugify } from "@/lib/utils";
 
 export type PostWithMeta = Post & {
   readingMinutes: number;
@@ -16,9 +18,29 @@ function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) {
-    throw new Error("Missing Supabase environment variables.");
+    return null;
   }
   return createSupabaseClient(url, key);
+}
+
+/** Fallback when Supabase projects table is empty */
+function getLocalProjects(): Project[] {
+  return localProjects.map((p) => ({
+    id: `local-${slugify(p.title)}`,
+    slug: slugify(p.title),
+    title: p.title,
+    description: p.description,
+    body: "",
+    published_at: "2026-01-01",
+    published: true,
+    featured: true,
+    tags: [],
+    tech: p.tech,
+    github_url: p.github ?? null,
+    live_url: p.live ?? null,
+    timeline: null,
+    learnings: [],
+  }));
 }
 
 function enrichPost(post: Post): PostWithMeta {
@@ -41,6 +63,7 @@ function enrichNote(note: Note): NoteWithMeta {
 
 export async function getPublishedPosts(): Promise<PostWithMeta[]> {
   const supabase = getSupabase();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("posts")
     .select("*")
@@ -58,6 +81,7 @@ export async function getFeaturedPosts(): Promise<PostWithMeta[]> {
 
 export async function getPostBySlug(slug: string): Promise<PostWithMeta | null> {
   const supabase = getSupabase();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("posts")
     .select("*")
@@ -112,6 +136,7 @@ export async function getRelatedPosts(
 
 export async function getPublishedNotes(): Promise<NoteWithMeta[]> {
   const supabase = getSupabase();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("notes")
     .select("*")
@@ -124,6 +149,7 @@ export async function getPublishedNotes(): Promise<NoteWithMeta[]> {
 
 export async function getNoteBySlug(slug: string): Promise<NoteWithMeta | null> {
   const supabase = getSupabase();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from("notes")
     .select("*")
@@ -142,13 +168,14 @@ export async function getNoteBacklinks(slug: string): Promise<NoteWithMeta[]> {
 
 export async function getPublishedProjects(): Promise<Project[]> {
   const supabase = getSupabase();
+  if (!supabase) return getLocalProjects();
   const { data, error } = await supabase
     .from("projects")
     .select("*")
     .eq("published", true)
     .order("published_at", { ascending: false });
 
-  if (error || !data) return [];
+  if (error || !data || data.length === 0) return getLocalProjects();
   return data as Project[];
 }
 
@@ -159,6 +186,9 @@ export async function getFeaturedProjects(): Promise<Project[]> {
 
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   const supabase = getSupabase();
+  if (!supabase) {
+    return getLocalProjects().find((p) => p.slug === slug) ?? null;
+  }
   const { data, error } = await supabase
     .from("projects")
     .select("*")
@@ -166,12 +196,15 @@ export async function getProjectBySlug(slug: string): Promise<Project | null> {
     .eq("published", true)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error || !data) {
+    return getLocalProjects().find((p) => p.slug === slug) ?? null;
+  }
   return data as Project;
 }
 
 export async function getReadingList(): Promise<ReadingItem[]> {
   const supabase = getSupabase();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from("reading_list")
     .select("*")

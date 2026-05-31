@@ -68,11 +68,21 @@ export default function HomeContent({
                     href={`/blog/${secondFeatured.slug}`}
                     className={`group block p-6 sm:p-8 ${contentLink}`}
                   >
-                    <h2 className="text-xl font-semibold tracking-tight">
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {secondFeatured.tags.slice(0, 3).map((tag) => (
+                        <BracketTag key={tag}>{tag}</BracketTag>
+                      ))}
+                    </div>
+                    <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                       {secondFeatured.title}
-                      <ArrowUpRight className="ml-1 inline h-4 w-4 opacity-60" />
+                      <ArrowUpRight className="ml-1 inline h-5 w-5 opacity-60" />
                     </h2>
-                    <p className="mt-2 text-sm text-muted">{secondFeatured.description}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-muted">
+                      {secondFeatured.description}
+                    </p>
+                    <p className="mt-6 font-mono text-xs text-muted-2">
+                      {formatStripeDate(secondFeatured.published_at)} · {secondFeatured.readingMinutes} min
+                    </p>
                   </Link>
                 </TerminalFrame>
               ) : (

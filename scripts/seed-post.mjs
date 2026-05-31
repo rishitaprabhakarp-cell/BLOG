@@ -1,8 +1,11 @@
 /**
- * Seed the first blog post into Supabase.
+ * Seed blog posts from content/posts/manifest.json into Supabase.
  *
- * Requires SUPABASE_SERVICE_ROLE_KEY in .env.local (Dashboard → Settings → API).
- * Run: node scripts/seed-first-post.mjs
+ * Usage:
+ *   node scripts/seed-post.mjs                    # seed all posts
+ *   node scripts/seed-post.mjs cropguardian-...   # seed one slug
+ *
+ * Requires SUPABASE_SERVICE_ROLE_KEY in .env.local
  */
 
 import { readFileSync } from "node:fs";
@@ -32,7 +35,7 @@ function loadEnv() {
       if (!(key in process.env)) process.env[key] = value;
     }
   } catch {
-    // .env.local optional if vars already exported
+    // optional
   }
 }
 
@@ -40,54 +43,53 @@ loadEnv();
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const targetSlug = process.argv[2];
 
 if (!url || !serviceKey) {
   console.error(
     "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local",
   );
+  console.error("Alternatively run the matching file in supabase/seeds/ via SQL Editor.");
   process.exit(1);
 }
 
-const body = readFileSync(
-  join(root, "content/posts/bangalore-traffic-demand-prediction.md"),
-  "utf8",
+const manifest = JSON.parse(
+  readFileSync(join(root, "content/posts/manifest.json"), "utf8"),
 );
 
-const post = {
-  slug: "bangalore-traffic-demand-prediction",
-  title: "Bangalore Traffic Demand Prediction",
-  subtitle: "Project Whitepaper — Plain-Language Edition",
-  description:
-    "How we reached a 91.38 public score predicting city-grid traffic demand with temporal features, CatBoost, XGBoost, and an honest validation strategy built for hidden test data.",
-  body,
-  published_at: "2026-05-31",
-  published: true,
-  featured: true,
-  category: "research",
-  tags: [
-    "machine-learning",
-    "traffic",
-    "catboost",
-    "xgboost",
-    "ensemble",
-    "feature-engineering",
-  ],
-};
+const posts = targetSlug
+  ? manifest.filter((p) => p.slug === targetSlug)
+  : manifest;
+
+if (posts.length === 0) {
+  console.error(targetSlug ? `No post found for slug: ${targetSlug}` : "No posts in manifest");
+  process.exit(1);
+}
 
 const supabase = createClient(url, serviceKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
-const { data, error } = await supabase
-  .from("posts")
-  .upsert(post, { onConflict: "slug" })
-  .select("slug, title, published")
-  .single();
+for (const meta of posts) {
+  const body = readFileSync(
+    join(root, "content/posts", meta.markdown),
+    "utf8",
+  );
 
-if (error) {
-  console.error("Seed failed:", error.message);
-  process.exit(1);
+  const { slug, markdown: _md, ...row } = meta;
+  const post = { ...row, slug, body };
+
+  const { data, error } = await supabase
+    .from("posts")
+    .upsert(post, { onConflict: "slug" })
+    .select("slug, title, published")
+    .single();
+
+  if (error) {
+    console.error(`Failed to seed ${slug}:`, error.message);
+    process.exit(1);
+  }
+
+  console.log("Seeded:", data);
+  console.log(`View at: /blog/${slug}`);
 }
-
-console.log("Seeded post:", data);
-console.log("View at: /blog/bangalore-traffic-demand-prediction");

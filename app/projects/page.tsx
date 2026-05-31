@@ -5,7 +5,7 @@ import SlashLabel from "@/components/stripe/SlashLabel";
 import BracketTag from "@/components/stripe/BracketTag";
 import StatsTicker from "@/components/stripe/StatsTicker";
 import { getPublishedProjects } from "@/lib/data";
-import { formatStripeDate } from "@/lib/utils";
+import { consoleHover, formatStripeDate } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -35,21 +35,28 @@ export default async function ProjectsPage() {
               <li key={project.slug}>
                 <Link
                   href={`/projects/${project.slug}`}
-                  className="group block p-6"
+                  className={`group block p-6 transition-colors ${consoleHover}`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h2 className="text-xl font-semibold">{project.title}</h2>
-                      <p className="mt-2 text-sm opacity-80">{project.description}</p>
+                      <p className="mt-2 text-sm text-muted group-hover:text-highlight-fg/80">
+                        {project.description}
+                      </p>
                       <div className="mt-3 flex flex-wrap gap-1.5">
                         {project.tech.map((t) => (
-                          <BracketTag key={t}>{t}</BracketTag>
+                          <BracketTag
+                            key={t}
+                            className="group-hover:border-highlight-fg/40 group-hover:text-highlight-fg/80"
+                          >
+                            {t}
+                          </BracketTag>
                         ))}
                       </div>
                     </div>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 opacity-0 group-hover:opacity-100" />
+                    <ArrowUpRight className="h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-highlight-fg" />
                   </div>
-                  <p className="mt-4 font-mono text-xs opacity-60">
+                  <p className="mt-4 font-mono text-xs text-muted-2 group-hover:text-highlight-fg/70">
                     {formatStripeDate(project.published_at)}
                     {project.timeline ? ` · ${project.timeline}` : ""}
                   </p>

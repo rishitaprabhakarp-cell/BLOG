@@ -78,17 +78,16 @@ Each row in the dataset answers:
 ### The twist that makes this hard
 
 ```mermaid
-gantt
-    title What we HAVE vs what we must PREDICT (Day 49)
-    dateFormat X
-    axisFormat %H:%M
+flowchart LR
+    subgraph train [Training labels we have]
+        N[Day 49 night<br/>00:00 to 02:00]
+    end
 
-    section Training labels
-    Day 49 night (00:00–02:00)     :done, 0, 120
-    Day 49 daytime (02:15–13:45)  :crit, 135, 825
+    subgraph gap [Must predict - no labels]
+        G[Day 49 daytime<br/>02:15 to 13:45]
+    end
 
-    section Test (no labels)
-    Predict this gap               :active, 135, 825
+    N --> G
 ```
 
 | What we have in training | What we must predict in test |
@@ -160,13 +159,12 @@ Think of it as: *“How much of the true pattern did we capture?”*
 
 R² punishes **systematic mistakes** heavily. If you predict everything 60% too high, the score collapses — even if the general shape looks right.
 
-```mermaid
-xychart-beta
-    title "Selected leaderboard results (public test)"
-    x-axis ["Probe C<br/>(scaled up)", "Probe I<br/>(pure copy)", "Hybrid", "Ensemble<br/>(best)"]
-    y-axis "Score" 0 --> 100
-    bar [60.94, 79.55, 90.96, 91.38]
-```
+| Approach | Score |
+|----------|-------|
+| Probe C (scaled up) | 60.94 |
+| Probe I (pure copy) | 79.55 |
+| Hybrid | 90.96 |
+| **Ensemble (best)** | **91.38** |
 
 ---
 
@@ -178,13 +176,13 @@ We treated this as **three different sub-problems**, not one uniform rule:
 flowchart TB
     TEST[Test set: 41,778 rows]
 
-    TEST --> H2[Hour 2<br/>2,698 rows · 6.5%]
-    TEST --> DAY[Hours 3–13<br/>39,080 rows · 93.5%]
-    TEST --> MISS[No exact day-48 match<br/>4,642 rows · 11.1%]
+    TEST --> H2[Hour 2<br/>2,698 rows 6.5 pct]
+    TEST --> DAY[Hours 3 to 13<br/>39,080 rows 93.5 pct]
+    TEST --> MISS[No exact day-48 match<br/>4,642 rows 11.1 pct]
 
     H2 --> R2[Rule: use day-49 night data<br/>+ recent 15-min history]
-    DAY --> R1[Rule: often ≈ day-48<br/>same location + time]
-    MISS --> R3[Rule: fallback chain<br/>geo×hour → area avg → hour avg]
+    DAY --> R1[Rule: often about day-48<br/>same location + time]
+    MISS --> R3[Rule: fallback chain<br/>geo x hour to area avg]
 
     style H2 fill:#f96,stroke:#333
     style DAY fill:#9f6,stroke:#333
@@ -204,25 +202,22 @@ Changing **only hour 2** moved the score from **90.96 → 79.55** (−11 points)
 ### 6.1 Feature categories
 
 ```mermaid
-mindmap
-  root((Features))
-    Location
-      geohash
-      avg demand per cell
-      avg demand per cell per hour
-      target encoding
-    Time
-      hour minute
-      sin cos cyclical time
-      peak rush night flags
-    Memory lags
-      same slot yesterday d48
-      lag_1 lag_2 lag_3
-      rolling mean std
-      day-49 last known value
-    Road context
-      RoadType lanes
-      landmarks weather
+flowchart TB
+    ROOT[Features]
+    ROOT --> LOC[Location]
+    LOC --> L1[geohash]
+    LOC --> L2[avg demand per cell]
+    LOC --> L3[target encoding]
+    ROOT --> TIME[Time]
+    TIME --> T1[hour and minute]
+    TIME --> T2[sin cos cyclical time]
+    TIME --> T3[peak rush night flags]
+    ROOT --> MEM[Memory lags]
+    MEM --> M1[lag 1 lag 2 lag 3]
+    MEM --> M2[rolling mean std]
+    ROOT --> ROAD[Road context]
+    ROAD --> R1[RoadType lanes]
+    ROAD --> R2[landmarks weather]
 ```
 
 ### 6.2 Lag features (memory of the past)
@@ -279,25 +274,17 @@ A **model** learns patterns from past data and predicts future values. We used *
 
 ### 7.1 Model comparison (simple view)
 
-```mermaid
-quadrantChart
-    title Model roles in this project
-    x-axis Simple --> Complex
-    y-axis Low score --> High score
-    quadrant-1 Best blend zone
-    quadrant-2 Over-engineered
-    quadrant-3 Too naive
-    quadrant-4 Heavy but weak
-    Formula copy: [0.25, 0.55]
-    Hybrid rules+ML: [0.45, 0.75]
-    CatBoost alone: [0.55, 0.72]
-    XGBoost alone: [0.55, 0.70]
-    2-model ensemble: [0.50, 0.85]
-    9-model stack: [0.85, 0.73]
-    Public 100 overfit: [0.90, 0.95]
-```
+| Approach | Complexity | Relative score |
+|----------|------------|----------------|
+| Formula copy | Low | Medium |
+| Hybrid rules + ML | Medium | High |
+| CatBoost alone | Medium-high | High |
+| XGBoost alone | Medium-high | High |
+| **2-model ensemble** | Medium | **Best honest result** |
+| 9-model stack | Very high | Marginal gain |
+| Public score of 100 | — | Likely overfit |
 
-*Quadrant positions are illustrative scores relative to our experiments, not exact measurements.*
+*Scores are illustrative based on our experiments, not exact measurements.*
 
 ### 7.2 CatBoost
 
@@ -380,18 +367,12 @@ On honest temporal validation, our improved pipeline reached **~87 R² on held-o
 ### 9.1 Score timeline
 
 ```mermaid
-timeline
-    title Key submissions and lessons
-    section Early ML
-        Multi-model stack : ~90.x : Many tree models blended
-        Hybrid formula+ML : 90.96 : Day-48 copy + hour-2 ML
-    section Probes
-        Scale all ×1.64 : 60.94 : FAILED — never inflate daytime
-        Night-calibrated ML : 80.09 : FAILED — wrong calibration
-        Pure day-48 copy : 79.55 : FAILED — hour 2 needs special rule
-    section Best
-        XGB + CatBoost blend : 91.38 : CURRENT BEST
-        Temporal pipeline : ~87 CV : Best honest local validation
+flowchart TB
+    E1[Multi-model stack ~90.x] --> H[Hybrid 90.96]
+    H --> P1[Probe scale x1.64 - 60.94 FAIL]
+    H --> P2[Pure day-48 copy - 79.55 FAIL]
+    H --> BEST[XGB + CatBoost blend - 91.38 BEST]
+    BEST --> CV[Temporal pipeline ~87 CV]
 ```
 
 ### 9.2 Full submission log
@@ -552,7 +533,7 @@ flowchart TB
     subgraph next [Possible next steps]
         N1[Blend ensemble + hour-2 persistence]
         N2[Tune CatBoost on temporal CV]
-        N3[Single clean .py for final submission]
+        N3[Single clean Python script for submission]
     end
 
     limits --> next

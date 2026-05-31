@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed:post": "node scripts/seed-first-post.mjs"
+    "seed:post": "node scripts/seed-post.mjs",
+    "seed:posts": "node scripts/seed-post.mjs",
+    "seed:sql": "node scripts/generate-post-seed-sql.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

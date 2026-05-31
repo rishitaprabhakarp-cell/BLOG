@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Plus } from "lucide-react";
 import { CATEGORY_LABELS, type PostCategory } from "@/lib/database.types";
 import type { PostWithMeta } from "@/lib/data";
-import { cn, formatStripeDate } from "@/lib/utils";
+import { cn, consoleHover, formatStripeDate } from "@/lib/utils";
 import SlashLabel from "@/components/stripe/SlashLabel";
 import BracketTag from "@/components/stripe/BracketTag";
 import { fadeUp, staggerContainer, staggerItem } from "@/lib/motion";
@@ -101,18 +101,19 @@ export default function BlogList({ posts, tags, categories }: BlogListProps) {
                   <Link
                     href={`/blog/${post.slug}`}
                     className={cn(
-                      "group grid grid-cols-[120px_1fr_24px] items-center gap-4 border-b border-border py-4 sm:grid-cols-[140px_1fr_32px]",
+                      "group -mx-3 grid grid-cols-[120px_1fr_24px] items-center gap-4 border-b border-border px-3 py-4 transition-colors sm:-mx-4 sm:grid-cols-[140px_1fr_32px] sm:px-4",
+                      consoleHover,
                     )}
                   >
                     <span className="flex items-center gap-2 font-mono text-xs">
-                      <span className="inline-block h-2 w-2 bg-accent" />
+                      <span className="inline-block h-2 w-2 bg-accent group-hover:bg-highlight-fg" />
                       {formatStripeDate(post.published_at)}
                     </span>
                     <span className="flex items-center gap-2 text-base font-medium tracking-tight">
                       {post.title}
                       <ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
                     </span>
-                    <Plus className="h-3.5 w-3.5 text-muted-2" />
+                    <Plus className="h-3.5 w-3.5 text-muted-2 group-hover:text-highlight-fg" />
                   </Link>
                 </motion.li>
               ))}

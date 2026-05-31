@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "bangalore-traffic-demand-prediction",
+    "markdown": "bangalore-traffic-demand-prediction.md",
+    "title": "Bangalore Traffic Demand Prediction",
+    "subtitle": "Project Whitepaper — Plain-Language Edition",
+    "description": "How we reached a 91.38 public score predicting city-grid traffic demand with temporal features, CatBoost, XGBoost, and an honest validation strategy built for hidden test data.",
+    "published_at": "2026-05-31",
+    "published": true,
+    "featured": true,
+    "category": "research",
+    "tags": ["machine-learning", "traffic", "catboost", "xgboost", "ensemble", "feature-engineering"]
+  },
+  {
+    "slug": "cropguardian-ai-agricultural-threat-detection",
+    "markdown": "cropguardian-ai-agricultural-threat-detection.md",
+    "title": "CropGuardian — AI Agricultural Threat Detection",
+    "subtitle": "Project Whitepaper — Plain-Language Edition",
+    "description": "CropGuardian is a mobile-first agricultural assistant with live COCO-SSD threat scanning, a searchable pest wiki, smart alert history, and on-device privacy — built with Next.js 15 and TensorFlow.js.",
+    "published_at": "2026-05-31",
+    "published": true,
+    "featured": false,
+    "category": "engineering",
+    "tags": ["agritech", "tensorflow.js", "computer-vision", "privacy", "next.js", "coco-ssd"]
+  }
+]
