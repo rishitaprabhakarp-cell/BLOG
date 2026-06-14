@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { renderMermaidChart } from "@/lib/render-mermaid";
 
 type MermaidDiagramProps = {
   chart: string;
@@ -14,57 +15,62 @@ function removeMermaidErrorArtifacts() {
 
 export default function MermaidDiagram({ chart }: MermaidDiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const id = useId().replace(/:/g, "");
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    const source = chart.trim();
 
-    async function render() {
-      const source = chart.trim();
-      if (!source || !containerRef.current) return;
+    if (!source || !containerRef.current) return;
 
-      try {
-        const mermaid = (await import("mermaid")).default;
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: "dark",
-          securityLevel: "strict",
-          suppressErrorRendering: true,
-          fontFamily: "var(--font-mono), monospace",
-        });
+    setFailed(false);
+    containerRef.current.innerHTML = "";
 
-        await mermaid.parse(source);
-
-        const { svg } = await mermaid.render(`mermaid-${id}`, source);
+    renderMermaidChart(source)
+      .then((svg) => {
         if (!cancelled && containerRef.current) {
           containerRef.current.innerHTML = svg;
         }
-      } catch {
-        if (!cancelled && containerRef.current) {
-          containerRef.current.innerHTML = "";
-          const fallback = document.createElement("pre");
-          fallback.className =
-            "overflow-x-auto rounded-lg border border-border bg-[var(--terminal-bg)] p-4 font-mono text-xs text-muted whitespace-pre-wrap";
-          fallback.textContent = source;
-          containerRef.current.appendChild(fallback);
+      })
+      .catch((error) => {
+        if (process.env.NODE_ENV === "development") {
+          console.error("Mermaid render failed:", error);
         }
-      } finally {
+        if (!cancelled) {
+          setFailed(true);
+        }
+      })
+      .finally(() => {
         removeMermaidErrorArtifacts();
-      }
-    }
+      });
 
-    render();
     return () => {
       cancelled = true;
       removeMermaidErrorArtifacts();
     };
-  }, [chart, id]);
+  }, [chart]);
+
+  if (failed) {
+    return (
+      <div
+        className="my-8 rounded-lg border border-border bg-[var(--terminal-bg)] p-4"
+        role="img"
+        aria-label="Diagram could not be rendered"
+      >
+        <p className="mb-2 font-mono text-xs text-muted-2">Diagram preview unavailable</p>
+        <pre className="overflow-x-auto font-mono text-xs text-muted whitespace-pre-wrap">
+          {chart.trim()}
+        </pre>
+      </div>
+    );
+  }
 
   return (
     <div
       ref={containerRef}
       className="my-8 flex justify-center overflow-x-auto rounded-lg border border-border bg-[var(--terminal-bg)] p-4 [&_svg]:max-w-full"
       aria-label="Diagram"
+      aria-busy={!failed}
     />
   );
 }

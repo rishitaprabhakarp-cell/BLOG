@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import readingTime from "reading-time";
 import { projects as localProjects } from "@/content/projects";
@@ -61,7 +62,7 @@ function enrichNote(note: Note): NoteWithMeta {
   };
 }
 
-export async function getPublishedPosts(): Promise<PostWithMeta[]> {
+export const getPublishedPosts = cache(async (): Promise<PostWithMeta[]> => {
   const supabase = getSupabase();
   if (!supabase) return [];
   const { data, error } = await supabase
@@ -72,7 +73,7 @@ export async function getPublishedPosts(): Promise<PostWithMeta[]> {
 
   if (error || !data) return [];
   return (data as Post[]).map(enrichPost);
-}
+});
 
 export async function getFeaturedPosts(): Promise<PostWithMeta[]> {
   const posts = await getPublishedPosts();
@@ -166,7 +167,7 @@ export async function getNoteBacklinks(slug: string): Promise<NoteWithMeta[]> {
   return notes.filter((n) => n.related_slugs.includes(slug));
 }
 
-export async function getPublishedProjects(): Promise<Project[]> {
+export const getPublishedProjects = cache(async (): Promise<Project[]> => {
   const supabase = getSupabase();
   if (!supabase) return getLocalProjects();
   const { data, error } = await supabase
@@ -177,7 +178,7 @@ export async function getPublishedProjects(): Promise<Project[]> {
 
   if (error || !data || data.length === 0) return getLocalProjects();
   return data as Project[];
-}
+});
 
 export async function getFeaturedProjects(): Promise<Project[]> {
   const projects = await getPublishedProjects();
