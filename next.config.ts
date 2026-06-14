@@ -1,11 +1,6 @@
 import type { NextConfig } from "next";
 import path from "path";
 
-const mermaidEsm = path.join(
-  process.cwd(),
-  "node_modules/mermaid/dist/mermaid.esm.mjs",
-);
-
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
@@ -22,13 +17,16 @@ const nextConfig: NextConfig = {
   },
   turbopack: {
     resolveAlias: {
-      mermaid: mermaidEsm,
+      mermaid: "mermaid/dist/mermaid.esm.mjs",
     },
   },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      mermaid: mermaidEsm,
+      mermaid: path.resolve(
+        process.cwd(),
+        "node_modules/mermaid/dist/mermaid.esm.mjs",
+      ),
     };
     return config;
   },

@@ -27,7 +27,7 @@ export default function Navbar({ commandItems }: NavbarProps) {
       variants={fadeIn}
       initial="hidden"
       animate="visible"
-      className="sticky top-0 z-50 border-b border-border bg-[var(--nav-bg)] backdrop-blur-sm"
+      className="sticky top-0 z-50 border-b border-border bg-(--nav-bg) backdrop-blur-sm"
     >
       <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-6 py-3 sm:px-10">
         <nav
@@ -47,13 +47,13 @@ export default function Navbar({ commandItems }: NavbarProps) {
                 className={cn(
                   "nav-tab no-console-hover group inline-flex items-center gap-0.5 border px-2 py-1 font-mono text-xs tracking-wide transition-colors",
                   active
-                    ? "nav-tab-active border-[var(--highlight)] bg-[var(--highlight)] text-[var(--highlight-fg)]"
-                    : "border-transparent text-[var(--nav-fg-muted)]",
+                    ? "nav-tab-active border-highlight bg-highlight text-highlight-fg"
+                    : "border-transparent text-(--nav-fg-muted)",
                 )}
               >
-                <span className="nav-bracket text-[var(--nav-bracket)]">[</span>
-                <span className="nav-key text-[var(--nav-key)]">{item.key}</span>
-                <span className="nav-bracket text-[var(--nav-bracket)]">]</span>
+                <span className="nav-bracket text-(--nav-bracket)">[</span>
+                <span className="nav-key text-(--nav-key)">{item.key}</span>
+                <span className="nav-bracket text-(--nav-bracket)">]</span>
                 <span className="ml-1">{item.label}</span>
               </Link>
             );

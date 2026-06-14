@@ -21,8 +21,7 @@ async function loadMermaid(): Promise<MermaidApi> {
         createDOMPurify(window);
       }
 
-      const mermaid = (await import("mermaid/dist/mermaid.esm.mjs"))
-        .default as MermaidApi;
+      const mermaid = (await import("mermaid")).default;
 
       if (!initialized) {
         mermaid.initialize({
